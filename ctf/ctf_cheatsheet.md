@@ -14,8 +14,8 @@ Reliable Linux/x86 (32-bit) shellcode. To find shellcode for your target archite
 Anatomy of a payload for bufferoverflow:
 
 ```
-Buffer start                                                                                        Saved EBP                    Return address                                Next Return address         Argument list
-|                                                                                                         |                                    |                                                        |                                        |
+Buffer start                                                     Saved EBP              Return address                     Next Return address       Argument list
+|                                                                |                      |                                  |                         |
 [optional NOP (0x90) bytes] [injected shellcode] [padding bytes] [fake/garbage address] [desired return address (&callee)] [callee's return address] [optional argument 1] [optional argument 2, etc]
 ```
 
