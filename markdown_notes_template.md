@@ -45,6 +45,6 @@ Section description.
 
 ####  Concept category (H4)
 
-* **Concept 1** - explaination.
+* **Concept 1** - explanation.
 
-* **Concept 2** - explaination.
+* **Concept 2** - explanation.
