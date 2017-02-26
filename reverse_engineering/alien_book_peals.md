@@ -28,23 +28,23 @@
 
     * ```spacebar``` - switch between graph and text views in the disassembly window (pg. 89).
     
-    *  ```G ``` - pressed from the disassembly window, specify a virtual address or named location to jump to. For raw file offsets (when opening a file as binary) use ```Jump > Jump to File Offset``` instead (pg.  94).
+    *  ```g ``` - pressed from the disassembly window, specify a virtual address or named location to jump to. For raw file offsets (when opening a file as binary) use ```Jump > Jump to File Offset``` instead (pg.  94).
     
-    * ```X``` - pressed after clicking a function name, shows cross-references to it, i.e. it's call sites. Also works for data, ex. references to  a particular string (pg. 96).
+    * ```x``` - pressed after clicking a function name, shows cross-references to it, i.e. it's call sites. Also works for data, ex. references to  a particular string (pg. 96).
     
-    * ```P``` - create a function where IDA has failed to disassemble one, use ```ALT-P``` to modify settings (pg. 96).
+    * ```p``` - create a function where IDA has failed to disassemble one, use ```Alt-p``` to modify settings (pg. 96).
     
     * ```:``` - add a comment to single line. Use ```;``` to add a comment that will propagate to all cross references to this line (pg. 100).
     
-    * ```O``` - change whether the selected operand is a memory reference or just numerical data. Useful if IDA mislabels a large constant as an address (pg. 101).
+    * ```o``` - change whether the selected operand is a memory reference or just numerical data. Useful if IDA mislabels a large constant as an address (pg. 101).
     
-    * ```U``` - undefine functions, code, or data. Useful when IDA can't correctly interpret the bytes, follow up with (pg. 103):
+    * ```u``` - undefine functions, code, or data. Useful when IDA can't correctly interpret the bytes, follow up with (pg. 103):
     
-        * ```C``` - define raw bytes as code.
+        * ```c``` - define raw bytes as code.
         
-        * ```D``` - define raw bytes as data.
+        * ```d``` - define raw bytes as data.
         
-        * ```A``` - define raw bytes as ASCII strings.
+        * ```a``` - define raw bytes as ASCII strings.
 
 * Two potential reasons to open a file as a raw binary - as opposed to a detected format like PE (pg. 88):
 
