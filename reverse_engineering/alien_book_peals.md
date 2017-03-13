@@ -3,6 +3,7 @@
 **Source:** Sikorski, Michael, and Andrew Honig. *Practical Malware Analysis: The Hands-on Guide to Dissecting Malicious Software.* San Francisco: No Starch Press, 2012.
 
 #### Chp. 4 - A Crash Course in x86 Disassembly
+---
 
 * Instructions you'll often see for optimization reasons (note this is Intel syntax, not AT&T, so ```<instruc> <dest>,<src>```):
 
@@ -16,13 +17,14 @@
 
 * A function containing a seemly random combination of ```xor, or, and, shl, ror, rol ``` is likely an encryption or compression function (pg. 76).
 
-* By common convention, parameters and variables are referenced relative to (i.e. offsets from) ```EBP```, if we're within a stack frame (pg. 77).
+* By common convention, parameters and variables are referenced relative to (i.e. offsets from) ```ebp```, if we're within a stack frame (pg. 77).
 
-    * Aside: The stack grows downward, so negative offsets from ```EBP``` indicate variables local to a function (within frame) while positive offsets from ```EBP``` indicate parameters passed to the function by the caller (above current frame, bottom of previous/callee frame).
+    * Aside: The stack grows downward, so negative offsets from ```ebp``` indicate variables local to a function (within frame) while positive offsets from ```ebp``` indicate parameters passed to the function by the caller (above current frame, bottom of previous/callee frame).
 
 * The ```pusha``` and ```pushad``` instructions push the 16-bit and 32-bit registers onto the stack, respectively.  ```popa``` and ```popad``` restore them. These are rarely used by compilers, so seeing them is likely an indicator of human-written assembly or shellcode (pg. 80).
 
 #### Chp. 5 - IDA Pro
+---
 
 * Useful shortcuts:
 
@@ -46,6 +48,8 @@
         
         * ```a``` - define raw bytes as ASCII strings.
 
+    * ```t``` - assign struct to a memory reference for improved readability, must create the struct first (pg. 130, next chapter).
+
 * Two potential reasons to open a file as a raw binary - as opposed to a detected format like PE (pg. 88):
 
     * Malware may append additional code/data to PE files, this content may not be loaded into memory by the OS's loader - which IDA emulates when opening a pre-detected filetype. Loading the binary allows you to pull in the header and individual sections (ex. ```.rsrc```).
@@ -54,7 +58,36 @@
 
 * In any given function, IDA can only label parameters and local variables used in the in binary - more might have existed in the source code, so you can't assume it's found everything (pg. 98). 
 
+#### Chp. 6 - Recognizing C Code Constructs in Assembly
+---
 
+* In disassembly, global variables are referenced by memory address (absolute pointer) and local variables are referenced by stack address (relative to ```ebp``` within a frame) (pg. 80).
+
+* An ```if``` statement will always result in a conditional jump in the disassembly, but obviously not all conditional jumps are related to ```if``` statements (pg. 113).
+
+* A ```for``` loop in disassembly can be identified by looking for it's 4 components: counter initialization, comparison, it's execution instructions, and counter increment/decrement (pg. 116). A ```while``` loop is similar, but the disassembly is slightly simpler (pg. 118).
+
+* Calling conventions:
+
+    * ```cdecl``` - params pushed onto stack right to left (last pushed first), caller cleans up stack after the call returns, return values passed in ```eax``` (pg. 119).
+    
+    * ```stdcall``` - like ```cdecl``` but callee cleans arguments from frame, so you'll see instructions like ```add esp, 12h``` in the callee instead of after the call site in the caller (pg. 120).
+    
+    * ```fastcall``` - most variable across compilers, but generally: first two params passed in ```edx``` and ```ecx```, additional params pushed right to left, and caller does cleanup. More efficient since register access is faster than stack memory access (pg. 120).
+    
+* Instead of pushing function call arguments onto the stack (ex. ```push ecx```) the compiler might move them to a stack pointer-relative location (ex. ```mov [esp+4], ecx```). In the latter case you don't need to increment the stack pointer for cleanup after the call (pg. 121).
+
+*  A ```switch``` statement will be implemented in disassembly either like an ```if``` statement series (several conditional jumps, sometimes impossible to tell apart from an ```if``` series) or as a jump table (optimization for large, contiguous switch statements where offsets to multiple memory locations are defined in a table and the switch variable indexes the table) (pg. 121).
+
+    * Ex. Backdoors often use ```switch``` statements to select an action based on a single byte value.
+
+*  In the disassembly, arrays are accessed using the base address as a starting point and indexed using element-sized offsets - so you may be able to infer element type/size by analyzing indexing logic. This is true whether the array is global or local (pg. 127).
+
+    * Ex. Malware might use an array of string pointers to hostnames as a means of selecting connection options.
+
+* Like arrays, stucts are accessed using a base address and offsets to individual members. It might be difficult to determine if nearby data types are part of a struct or just happen to be contiguous in memory (pg. 128).
+
+    * Ex. Malware will maintain structs for it's own internal purposes, as well as for making Windows API calls - many of which require stucts passed by reference.
 
 
 
