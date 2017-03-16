@@ -2,7 +2,7 @@
 
 **Source:** Sikorski, Michael, and Andrew Honig. *Practical Malware Analysis: The Hands-on Guide to Dissecting Malicious Software.* San Francisco: No Starch Press, 2012.
 
-#### Chp. 4 - A Crash Course in x86 Disassembly
+### Chp. 4 - A Crash Course in x86 Disassembly
 ---
 
 * Instructions you'll often see for optimization reasons (note this is Intel syntax, not AT&T, so ```<instruc> <dest>,<src>```):
@@ -23,7 +23,7 @@
 
 * The ```pusha``` and ```pushad``` instructions push the 16-bit and 32-bit registers onto the stack, respectively.  ```popa``` and ```popad``` restore them. These are rarely used by compilers, so seeing them is likely an indicator of human-written assembly or shellcode (pg. 80).
 
-#### Chp. 5 - IDA Pro
+### Chp. 5 - IDA Pro
 ---
 
 * Useful shortcuts:
@@ -49,6 +49,8 @@
         * ```a``` - define raw bytes as ASCII strings.
 
     * ```t``` - assign struct to a memory reference for improved readability, must create the struct first (pg. 130, next chapter).
+    
+    * ```insert``` - add a structure via the structure subview (pg. 156, next chapter).
 
 * Two potential reasons to open a file as a raw binary - as opposed to a detected format like PE (pg. 88):
 
@@ -58,7 +60,7 @@
 
 * In any given function, IDA can only label parameters and local variables used in the in binary - more might have existed in the source code, so you can't assume it's found everything (pg. 98). 
 
-#### Chp. 6 - Recognizing C Code Constructs in Assembly
+### Chp. 6 - Recognizing C Code Constructs in Assembly
 ---
 
 * In disassembly, global variables are referenced by memory address (absolute pointer) and local variables are referenced by stack address (relative to ```ebp``` within a frame) (pg. 80).
@@ -89,7 +91,39 @@
 
     * Ex. Malware will maintain structs for it's own internal purposes, as well as for making Windows API calls - many of which require stucts passed by reference.
 
+### Chp. 7 - Analyzing Malicious Windows Programs
+---
 
+* Handles are references to items opened/created by the OS (window, process, module, etc). Like pointers, they reference objects or memory locations. Unlike pointers they can't be used in arithmetic operations - although some functions return handles representing values that can be used as pointers. The information stored in a handle is undocumented and they should only be manipulated by the Windows API (pg. 137).
 
+* Malware may use file mapping functions to load files into memory and manipulate them (ex. parse and modify PE header), emulating the functionality of the Windows loader by creating in-memory executables dynamically (pg. 138).
+
+    * ```MapCreateFileMapping``` - load a file from disk to memory.
+
+    * ```MapViewOfFile``` - returns a pointer to the base address of the mapping, can be used to read/write anywhere in the file.
+
+* Malware may try to access a disk directly through it's namespace (ex. ```\\.\PhysicalDisk1```) to bypass the normal API and treat this disk as a file - this could allow it to read/write data in unallocated sectors without creating/accessing files (pg. 138).
+
+* Malware uses the Windows Registry for persistence or configuration data, so if you see functions ```RegOpenKeyEx```, ```RegSetValueEx```, or ```RegGetValueEx``` be sure to identify the registry keys accessed/modified (pg. 141).
+
+* Network communication will be preceeded by a call to ```WSAStartup```, which allocates resources for networking libraries, a prerequisite to using network functions (pg. 144).
+
+    * Client functionality will use the following functions, in order: ```socket```, ```connect```, ```send``` and ```recv``` as necessary.
+    
+    * Server functionality will use the following functions, in order: ```socket```, ```bind```, ```listen```, ```accept```, ```send``` and ```recv``` as necessary.
+    
+* To create a remote shell, malware could open a socket, populate the I/O streams (stdin, stdout, stderr) of the ```STARTUPINFO``` struct with the socket's handle, and pass this struct as a parameter to ```CreateProcess``` along with a path to an executable. When the spawned process reads and writes, it will be doing so over a remote connection (pg. 148). 
+
+* DLL files, like EXE files, use the PE format. Despite being used very differently, they have essentially identical makeup. The only "physical" difference is a single flag in the header indicating which of the two the file should treated as, and the fact the DLLs will have more exports than imports. (pg. 146).
+
+* Mutexes (synchronization primitives for concurrent access to shared resources) often use hard coded names in order to appear consistent to threads accessing them, which may not communicate otherwise. This makes them a reliable host-based indicator. Additionally malware may attempt to access an existing mutex by name, before creating it, to test that it's the only instance running on it's host (pg. 152).
+
+* Malware might implement a Component Object Model (COM) server in order to inject code into other processes, especially through Browser Helper Objects (BHOs) for Internet Explorer. Neccessary imports: ```DllCanUnloadNow```, ```DllGetClassObject```, ```DllInstall```, ```DllRegisterServer```, and ```DllUnregistserServer```.
+
+* The Native API, which bypasses the standard Windows API for syscalls, is often used in malware and almost never used in legitimate software.
+
+    * Flow of normal API Call: ```User App``` > ```Kernel32.dll``` > ```Ntdll.dll``` > ```Ntoskrnl.exe``` > ```Kernel Data Structures```
+    
+    * Flow of native API Call: ```User App``` > ```Ntdll.dll``` > ```Ntoskrnl.exe``` > ```Kernel Data Structures```
 
 
