@@ -34,7 +34,7 @@
     
     * ```x``` - pressed after clicking a function name, shows cross-references to it, i.e. it's call sites. Also works for data, ex. references to  a particular string (pg. 96).
     
-    * ```p``` - create a function where IDA has failed to disassemble one, use ```Alt-p``` to modify settings (pg. 96).
+    * ```p``` - create a function where IDA has failed to disassemble one, use ```Alt-p``` to modify settings, ex. editing function boundaries (pg. 96).
     
     * ```:``` - add a comment to single line. Use ```;``` to add a comment that will propagate to all cross references to this line (pg. 100).
     
@@ -51,6 +51,8 @@
     * ```t``` - assign struct to a memory reference for improved readability, must create the struct first (pg. 130, next chapter).
     
     * ```insert``` - add a structure via the structure subview (pg. 156, next chapter).
+    
+    * ```ctrl+k``` - open stack frame display, which shows local variables (pg.348, chp. 15).
 
 * Two potential reasons to open a file as a raw binary - as opposed to a detected format like PE (pg. 88):
 
@@ -126,4 +128,23 @@
     
     * Flow of native API Call: ```User App``` > ```Ntdll.dll``` > ```Ntoskrnl.exe``` > ```Kernel Data Structures```
 
+### Chp. 15 - Anti-Dissassembly
+---
 
+* Anti-disassembly relies on subverting the disassembler's algorithm. There are two algorithms:
+
+    * Linear-dissemblers process bytes sequentially and blindly, using the size of the current disassembled instruction to determine the start of the next. If next is invalid, the increment until the happen to find a series of bytes corresponding to a valid instruction. They have no notion of control flow and can't deal with "rouge" bytes (i.e. never executed as an instruction) so it's easy for the attacker to get them to malign offsets and interpret subsequent code incorrectly (pg. 330).
+    
+    * Flow-oriented disassemblers take into account control flow and build a list of locations to disassemble next (i.e. jump targets). They may still get "confused" (ex. if the rouge bytes following a jump that will always be taken aren't valid instructions), but they are generally more robust/reliable (pg. 332).
+    
+* Two anti-disassembly techniques (jump instructions with same target, jump instructions with constant condition) introduce rouge bytes that confuse the dissembler but can safely be ignored. "Impossible disassembly" introduces rouge bytes such that a single byte is actually part of two different instructions - current dissembler's can't cope with this scenario and these will have be be patched manually to be equivalent to the original's execution (pg. 337).
+
+* Tactics for obscuring control flow:
+
+    * Non-standard use of function pointers - if the code loads a function pointer into the local variable and then uses that variable to make calls, IDA will only tag the load as a cross reference and not the calls - resulting in incorrect control flow graphs (pg 340).
+    
+    * Return pointer abuse - a function might obscure itself by calculating it's true start address and pushing it onto the stack, then using ```retn``` to pop that value and jump to it. IDA can't handle these cases and will need manual re-analysis of the function (pg. 342).
+    
+    * Structured Exception Handler (SEH) abuse - you can add a new head record to the SEH linked list (push handler address, push pointer to last record, i.e. current ```fs:[0]```, then repoint ```fs:[0]``` to ```esp```, i.e. your new record), then trigger an exception to call it, and carefully restore the stack when done. IDA will assume the handler is a function without references and may even fail to disassemble it (pg. 345). 
+    
+    
