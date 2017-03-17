@@ -96,7 +96,7 @@
 ### Chp. 7 - Analyzing Malicious Windows Programs
 ---
 
-* Handles are references to items opened/created by the OS (window, process, module, etc). Like pointers, they reference objects or memory locations. Unlike pointers they can't be used in arithmetic operations - although some functions return handles representing values that can be used as pointers. The information stored in a handle is undocumented and they should only be manipulated by the Windows API (pg. 137).
+* **Handle** - references to item opened/created by the OS (window, process, module, etc). Like pointers, they reference objects or memory locations. Unlike pointers they can't be used in arithmetic operations - although some functions return handles representing values that can be used as pointers. The information stored in a handle is undocumented and they should only be manipulated by the Windows API (pg. 137).
 
 * Malware may use file mapping functions to load files into memory and manipulate them (ex. parse and modify PE header), emulating the functionality of the Windows loader by creating in-memory executables dynamically (pg. 138).
 
@@ -104,7 +104,7 @@
 
     * ```MapViewOfFile``` - returns a pointer to the base address of the mapping, can be used to read/write anywhere in the file.
 
-* Malware may try to access a disk directly through it's namespace (ex. ```\\.\PhysicalDisk1```) to bypass the normal API and treat this disk as a file - this could allow it to read/write data in unallocated sectors without creating/accessing files (pg. 138).
+* Malware may try to access a disk directly through it's **namespace** (ex. ```\\.\PhysicalDisk1```) to bypass the normal API and treat this disk as a file - this could allow it to read/write data in unallocated sectors without creating/accessing files (pg. 138).
 
 * Malware uses the Windows Registry for persistence or configuration data, so if you see functions ```RegOpenKeyEx```, ```RegSetValueEx```, or ```RegGetValueEx``` be sure to identify the registry keys accessed/modified (pg. 141).
 
@@ -118,11 +118,11 @@
 
 * DLL files, like EXE files, use the PE format. Despite being used very differently, they have essentially identical makeup. The only "physical" difference is a single flag in the header indicating which of the two the file should treated as, and the fact the DLLs will have more exports than imports. (pg. 146).
 
-* Mutexes (synchronization primitives for concurrent access to shared resources) often use hard coded names in order to appear consistent to threads accessing them, which may not communicate otherwise. This makes them a reliable host-based indicator. Additionally malware may attempt to access an existing mutex by name, before creating it, to test that it's the only instance running on it's host (pg. 152).
+* **Mutexes** (synchronization primitives for concurrent access to shared resources) often use hard coded names in order to appear consistent to threads accessing them, which may not communicate otherwise. This makes them a reliable host-based indicator. Additionally malware may attempt to access an existing mutex by name, before creating it, to test that it's the only instance running on it's host (pg. 152).
 
-* Malware might implement a Component Object Model (COM) server in order to inject code into other processes, especially through Browser Helper Objects (BHOs) for Internet Explorer. Neccessary imports: ```DllCanUnloadNow```, ```DllGetClassObject```, ```DllInstall```, ```DllRegisterServer```, and ```DllUnregistserServer```.
+* Malware might implement a Component Object Model (COM) server in order to inject code into other processes, especially through Browser Helper Objects (BHOs) for Internet Explorer. Neccessary imports: ```DllCanUnloadNow```, ```DllGetClassObject```, ```DllInstall```, ```DllRegisterServer```, and ```DllUnregistserServer``` (pg. 157).
 
-* The Native API, which bypasses the standard Windows API for syscalls, is often used in malware and almost never used in legitimate software.
+* The **Native API**, which bypasses the standard Windows API for syscalls, is often used in malware and almost never used in legitimate software (pg. 160).
 
     * Flow of normal API Call: ```User App``` > ```Kernel32.dll``` > ```Ntdll.dll``` > ```Ntoskrnl.exe``` > ```Kernel Data Structures```
     
@@ -133,18 +133,51 @@
 
 * Anti-disassembly relies on subverting the disassembler's algorithm. There are two algorithms:
 
-    * Linear-dissemblers process bytes sequentially and blindly, using the size of the current disassembled instruction to determine the start of the next. If next is invalid, the increment until the happen to find a series of bytes corresponding to a valid instruction. They have no notion of control flow and can't deal with "rouge" bytes (i.e. never executed as an instruction) so it's easy for the attacker to get them to malign offsets and interpret subsequent code incorrectly (pg. 330).
+    * **Linear-dissemblers** process bytes sequentially and blindly, using the size of the current disassembled instruction to determine the start of the next. If next is invalid, the increment until the happen to find a series of bytes corresponding to a valid instruction. They have no notion of control flow and can't deal with "rouge" bytes (i.e. never executed as an instruction) so it's easy for the attacker to get them to malign offsets and interpret subsequent code incorrectly (pg. 330).
     
-    * Flow-oriented disassemblers take into account control flow and build a list of locations to disassemble next (i.e. jump targets). They may still get "confused" (ex. if the rouge bytes following a jump that will always be taken aren't valid instructions), but they are generally more robust/reliable (pg. 332).
+    * **Flow-oriented disassemblers** take into account control flow and build a list of locations to disassemble next (i.e. jump targets). They may still get "confused" (ex. if the rouge bytes following a jump that will always be taken aren't valid instructions), but they are generally more robust/reliable (pg. 332).
     
 * Two anti-disassembly techniques (jump instructions with same target, jump instructions with constant condition) introduce rouge bytes that confuse the dissembler but can safely be ignored. "Impossible disassembly" introduces rouge bytes such that a single byte is actually part of two different instructions - current dissembler's can't cope with this scenario and these will have be be patched manually to be equivalent to the original's execution (pg. 337).
 
 * Tactics for obscuring control flow:
 
-    * Non-standard use of function pointers - if the code loads a function pointer into the local variable and then uses that variable to make calls, IDA will only tag the load as a cross reference and not the calls - resulting in incorrect control flow graphs (pg 340).
+    * **Non-standard use of function pointers** - if the code loads a function pointer into the local variable and then uses that variable to make calls, IDA will only tag the load as a cross reference and not the calls - resulting in incorrect control flow graphs (pg 340).
     
-    * Return pointer abuse - a function might obscure itself by calculating it's true start address and pushing it onto the stack, then using ```retn``` to pop that value and jump to it. IDA can't handle these cases and will need manual re-analysis of the function (pg. 342).
+    * **Return pointer abuse** - a function might obscure itself by calculating it's true start address and pushing it onto the stack, then using ```retn``` to pop that value and jump to it. IDA can't handle these cases and will need manual re-analysis of the function (pg. 342).
     
-    * Structured Exception Handler (SEH) abuse - you can add a new head record to the SEH linked list (push handler address, push pointer to last record, i.e. current ```fs:[0]```, then repoint ```fs:[0]``` to ```esp```, i.e. your new record), then trigger an exception to call it, and carefully restore the stack when done. IDA will assume the handler is a function without references and may even fail to disassemble it (pg. 345). 
+    * **Structured Exception Handler (SEH) abuse** - you can add a new head record to the SEH linked list (push handler address, push pointer to last record, i.e. current ```fs:[0]```, then repoint ```fs:[0]``` to ```esp```, i.e. your new record), then trigger an exception to call it, and carefully restore the stack when done. IDA will assume the handler is a function without references and may even fail to disassemble it (pg. 345). 
+
+### Chp. 18 - Packers and Unpacking
+---
+
+* The **unpacking stub** is responsible for 3 things: unpacking the original executable into memory, resolving all imports of the original executable, and transfering execution to the **original entry point (OEP)** . The most common way to resolve the original imports is for the stub to only import ```LoadLibrary``` (which it uses to load libaries the original import table requires) and ```GetProcAddress``` (which it uses to get the address of each function the original requires, to reconstruct the table) (pg. 385).
+
+* Indicators of a packed program (pg. 387):
+
+    * Few imports, especially if only ```LoadLibrary``` and ```GetProcAddress```
     
+    * Section names associated with a packer (ex. ```UPX0```)
+    
+    * Abnormal section sizes (ex. ```.text``` section has ```SizeOfRawData``` of zero, but ```VirtualSize``` is non-zero, in PE header)
+    
+    * IDA can only find recognize a small amount of code, OllyDbg throws warnings about packing
+
+* To obscure the **tail jump** (point where unpacking stub transfers control to the OEP), the stub will attempt to use ```retn``` or ```call``` instructions, or even OS functions ```NtContinue``` or ```ZwContinue``` (pg. 386).
+
+    * A tail jump that uses a literal ```jmp``` instruction will often have a target extremely far away and outside of the function, this will stand out in red in IDA's control flow graph - since IDA can't determine where the jump goes, as it expects a target within the function and the target location didn't contain valid instructions when the unpacking stub started (pg. 392).
+    
+    * One way to potentially find a tail jump is setting a breakpoint at ```GetProcAddress```, which most unpackers will have to use it when reconstructing the import table. This may get you close to the OEP. Likewise, you can set a breakpoint at a function likely to be called early in original executable - ```GetVersion``` and ```GetCommandLineA``` for command line programs, ```GetModuleHandleA``` for GUI programs. (pg. 395).
+    
+    * Another way to fine the OEP is to use OllyDbg's Run Trace option to set a breakpoint on the ```.text``` section. The section in the PE header so the loader can allocate memory for it, but it'll be missing from the packed executable. The OEP is always withing the ```.text``` section, it'll likely be the first instruction called within it (pg. 395).
+
+* For manual unpacking, if you can get a debugger to the point where the stub is about to tail jump, you can dump the unpacked executable from memory. At that point you'll need to reconstruct the import table and change the entry point in the PE header to the OEP using OllyDump, ImpRec, etc (pg. 390).
+
+* For simple unpackers, use OllyDbg's ```Plugins > OllyDump > Find OEP by Section Hop```. This is a heuristic approach that won't always be accurate - it assumes the unpacker is in one section and the executable is in another, the attempts to break  when control transfers from one section to another. The step-over method ignores function calls and won't find the OEP if transfer is done via a call that doesn't return. The step-into method has a better chance, but is prone to false positives (pg. 391).
+
+* In a packed DLL, the unpacking stub is placed where ```DllMain``` should be. OllyDbg supports debugging DLLs with ```loadDll.exe```, but it will call ```DllMain``` before breaking - so the stub may already have executed by the time a breakpoint is hit and it'll be hard to determine OEP. The workaround is flipping the appropriate bit (0x2000 place set to 1 for DLLs) of the ```Characteristics``` field in the ```IMAGE_FILE_HEADER``` section of the PE header to mark the file as an executable and not a DLL - then proceed as normal and revert when done (pg. 401).
+
+
+
+
+
     
