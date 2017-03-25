@@ -7,13 +7,15 @@ Random, bite-sized configuration changes for a better Arch experience.
 
 [reflector](https://wiki.archlinux.org/index.php/Reflector) can overwrite ```/etc/pacman.d/mirrorlist``` with the most current mirrors, sorted by speed.
 
-1. Backup current mirror list in case something goes wrong:
+1. Backup the existing mirror list in case something goes wrong:
 
     * ```sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup```
 
-2. Install and run reflector, populating your list with 200 most recently synced mirrors sorted by download rate:
+2. Install and run reflector, populating your list with the 200 most recently synced mirrors sorted by download rate:
 
-    * ```sudo pacman -S reflector && sudo reflector --verbose -l 200 -p http --sort rate --save /etc/pacman.d/mirrorlist```
+    * ```sudo pacman -S reflector```
+
+    * ```sudo reflector --verbose -l 200 -p http --sort rate --save /etc/pacman.d/mirrorlist```
     
 ### Use pacman's easter egg progress bar
 ---

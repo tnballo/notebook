@@ -1,6 +1,6 @@
-# "How-To" Instructions for Misc tasks on Arch Linux
+# "How-To" Instructions for Misc Tasks on Arch Linux
 
-Reference for those little tasks that are just uncommon enough to forget the steps for.
+Reference for those little tasks that are just uncommon enough to forget the steps involved.
 
 ### Mount a USB drive
 ---
@@ -9,7 +9,7 @@ Reference for those little tasks that are just uncommon enough to forget the ste
 
     * ```sudo blkid```
 
-2. Within the list, find the find the entry corresponding to USB drive you want to mount.
+2. Within the list, find the find the entry corresponding to the USB drive you want to mount.
 
     * Example entry: ```/dev/sda1: LABEL="WIN7ISO" UUID="AABE-7CAA" TYPE="vfat" PARTUUID="c3072e18-01```
     
