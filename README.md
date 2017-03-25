@@ -1,7 +1,7 @@
 # notebook
 Running notes - concepts, commands, and code snippets.
 
-####Contents Overview:
+#### Contents Overview:
 
 * [arch_linux](https://github.com/tnballo/notebook/tree/master/arch_linux) - minor configuration changes and brief "how-to" snippets for Arch Linux. See [dotfiles repo](https://github.com/tnballo/dotfiles) for more detail.
 
