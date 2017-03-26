@@ -170,15 +170,11 @@
     
     * Another way to fine the OEP is to use OllyDbg's Run Trace option to set a breakpoint on the ```.text``` section. The section in the PE header so the loader can allocate memory for it, but it'll be missing from the packed executable. The OEP is always withing the ```.text``` section, it'll likely be the first instruction called within it (pg. 395).
     
- >   **Aside**: the stack watch method (pg. 394) relies on the fact that the unpacking stub will save some state before starting it's operations and restore it before passing control to the unpacked program. To use this method:
-    
- >    1. In OllyDbg, find first stack push and note the stack address.
-        
- >    2. In the memory dump, press ```Ctrl+G``` ("Go" shortcut), enter this stack address, press ```Ok```.
-        
->    3. Right click the first value at this address, then ```Breakpoint > Hardware, on access > Dword```.
-        
- >    4. Continue to this breakpoint, should be very close to the tail jump (be sure to snapshot VM before doing so - if this method fails for your particular virus, the virus will run and the machine will be infected!).
+    >   **Aside**: the stack watch method (pg. 394) relies on the fact that the unpacking stub will save some state before starting it's operations and restore it before passing control to the unpacked program. To use this method:
+    >    1. In OllyDbg, find first stack push and note the stack address.
+    >    2. In the memory dump, press ```Ctrl+G``` ("Go" shortcut), enter this stack address, press ```Ok```.
+    >    3. Right click the first value at this address, then ```Breakpoint > Hardware, on access > Dword```.
+    >    4. Continue to this breakpoint, should be very close to the tail jump (be sure to snapshot VM before doing so - if this method fails for your particular virus, the virus will run and the machine will be infected!).
 
 * For manual unpacking, if you can get a debugger to the point where the stub is about to tail jump, you can dump the unpacked executable from memory. At that point you'll need to reconstruct the import table and change the entry point in the PE header to the OEP using OllyDump, ImpRec, etc (pg. 390).
 
