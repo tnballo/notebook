@@ -186,7 +186,7 @@
     
     * **Structured Exception Handler (SEH) abuse** - you can add a new head record to the SEH linked list (push handler address, push pointer to last record, i.e. current ```fs:[0]```, then repoint ```fs:[0]``` to ```esp```, i.e. your new record), then trigger an exception to call it, and carefully restore the stack when done. IDA will assume the handler is a function without references and may even fail to disassemble it (pg. 345). 
     
-    >    **Aside:**  A malicious handler might re-write instructions (modify opcodes) at some location in the program, ex. it's callsite. So it may be the case that IDA fails to disassemble the contents of the handler and that some other section of disassembly would be incorrect at runtime, after the handler executes.
+        >    **Aside:**  A malicious handler might re-write instructions (modify opcodes) at some location in the program, ex. it's callsite. So it may be the case that IDA fails to disassemble the contents of the handler and that some other section of disassembly would be incorrect at runtime, after the handler executes.
 
 ### Chp. 18 - Packers and Unpacking
 ---
