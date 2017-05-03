@@ -127,8 +127,47 @@
     * Flow of normal API Call: ```User App``` > ```Kernel32.dll``` > ```Ntdll.dll``` > ```Ntoskrnl.exe``` > ```Kernel Data Structures```
     
     * Flow of native API Call: ```User App``` > ```Ntdll.dll``` > ```Ntoskrnl.exe``` > ```Kernel Data Structures```
+    
+### Chp. 10 - Kernel Debugging with WinDbg
+---
 
-### Chp. 15 - Anti-Dissassembly
+* **Device drivers** run 3rd party code in the kernel, are loaded into memory on boot, and are accessed by userspace applications through **device objects** (one driver may create/destroy several device objects). When a driver is loaded, it's ```DriverEntry``` routine  populates the **driver object** structure with the appropriate callback addresses for standard (pre-defined) request names. Each callback address is placed at a specific index of the driver's major function table (pg. 206).
+
+* ```DeviceIoControl``` is the most common request seen in malicious kernel components: userspace app passes an arbitrary length buffer as input, gets arbitrary length buffer as output (pg. 206).
+
+* WinDbg useful basic commands (```*``` = post-fix modifier):
+
+    * ```d* addrToRead``` - read from memory (pg. 210).
+    
+    * ```e* addrToWrite dataToWrite``` - write to memory (pg. 211).
+    
+    * ```dwo (addrOrArithmeticAdderComputation) ``` - deference a 32-bit pointer (pg. 211).
+    
+    * ```bp nameOrAddr``` - set breakpoint (pg. 211).
+    
+    * ```lm``` - list modules loaded in a process, with start and end addresses (executables, DLLs in usermode, kernel drivers in kernel mode) (pg. 212).
+
+* WinDbg command examples:
+
+    * 	```bu newModule!exportedFuntion``` - set a breakpoint on ```exportedFunction``` as soon as it's containing module, ```newModule```, is loaded (deffered breakpoint, ```bu```) (pg. 212).
+    
+    * ```x nt!*CreateProcess*``` - search ```ntoskrnl.exe``` for any functions containing the string ```CreateProcess``` (pg. 213).
+    
+    * ```!drvobj FileWriter.sys``` - find (get the address of) a driver object named ```FileWriter.sys``` (pg. 217).
+    
+    * ```dt nt!_DRIVER_OBJECT 828b2648``` - display structure field names and thier corresponding values for the driver object at address ```828b2648``` (pg. 214).
+    
+        * Note that the ```DriverInit``` function is the only one called every time a driver is loaded, so a malicious driver might place it's entire payload there (pg. 214).
+        
+* **SSDT Hooking** - the System Service Descriptor Table (SSDT) maps syscalls to numbered entries, called with the ```SYSENTER``` instruction or equivalent and an table entry offset number in ```EAX```. A rootkit might "hook" the SSDT by replacing an entry's address with one of it's own functions, giving it the ability to MITM syscalls. To detect hooks, examine SSDT entries and look for an address not within the ```ntoskrnl.exe``` address range (pg. 222).
+
+    * Ex. hook ```NtCreateFile``` (which creates a file or opens an existing file/directory/device) and filter your malicious file out of the results returned, preventing anyone from acquiring a handle to it (pg. 222).
+    
+    * ```MmGetSystemRoutineAddress``` is a kernel mode equivalent of ```GetProcAddress``` that works on ```hal``` and ```ntoskrnl``` modules. Malware will use it to resolve the address of the SSDT table, i.e ```KeServiceDescriptorTable```,  and of a given entry within it (pg. 224).
+    
+    * Newer versions of Windows require drivers to be signed and use PatchGuard to prevent 3rd party code from making kernel modifications, including SSDT overwrites (pg. 227).
+
+### Chp. 15 - Anti-Disassembly
 ---
 
 * Anti-disassembly relies on subverting the disassembler's algorithm. There are two algorithms:
@@ -146,6 +185,8 @@
     * **Return pointer abuse** - a function might obscure itself by calculating it's true start address and pushing it onto the stack, then using ```retn``` to pop that value and jump to it. IDA can't handle these cases and will need manual re-analysis of the function (pg. 342).
     
     * **Structured Exception Handler (SEH) abuse** - you can add a new head record to the SEH linked list (push handler address, push pointer to last record, i.e. current ```fs:[0]```, then repoint ```fs:[0]``` to ```esp```, i.e. your new record), then trigger an exception to call it, and carefully restore the stack when done. IDA will assume the handler is a function without references and may even fail to disassemble it (pg. 345). 
+    
+    >    **Aside:**  A malicious handler might re-write instructions (modify opcodes) at some location in the program, ex. it's callsite. So it may be the case that IDA fails to disassemble the contents of the handler and that some other section of disassembly would be incorrect at runtime, after the handler executes.
 
 ### Chp. 18 - Packers and Unpacking
 ---
