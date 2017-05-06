@@ -196,7 +196,7 @@
 
 * A commonly used system binary can be **trojanized** - patched to execute malware on run or load. Ex. Modify an important system DLLs's ```DLLEntryPoint``` to load a malicious DLL before resuming normal operation, essentially injecting the malicious DLL into any process that uses the important one (pg. 243).
 
-* **DLL Load Order Hijacking **- if a DLL is not on the ```KnownDLLs``` list, there's a sequence of directories Windows will attempt to find it in. If a malicious DLL of the same name as a legitimate one is placed in a directory searched first, then the malicious one will get loaded and the search will terminate. The malicious one can  always import the legitimate one to maintain functionality. This method is simple and covert, no need for registry or binary modification (pg. 245).
+* **DLL Load Order Hijacking** - if a DLL is not on the ```KnownDLLs``` list, there's a sequence of directories Windows will attempt to find it in. If a malicious DLL of the same name as a legitimate one is placed in a directory searched first, then the malicious one will get loaded and the search will terminate. The malicious one can  always import the legitimate one to maintain functionality. This method is simple and covert, no need for registry or binary modification (pg. 245).
  
  * One method of **privilege escalation** is modification of a processes's access token: get a handle to own process via ```GetCurrentProcess```, open own access token via ```OpenProcessToken```, retrieve the Locally Unique Identifier (LUID) via ```LookupPrivilegeValueA```, and call ```AdjustTokenPrivilege``` to augment own rights (ex. ```SeDebugPrivilege``` allows debugging of other programs, useful for DLL injection) (pg. 247).
 
