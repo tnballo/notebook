@@ -167,6 +167,41 @@
     
     * Newer versions of Windows require drivers to be signed and use PatchGuard to prevent 3rd party code from making kernel modifications, including SSDT overwrites (pg. 227).
 
+### Chp. 11 - Malware Behavior
+---
+
+* A call to ```URLDownloadFileA``` followed by a call to ```WinExec``` likely indicates a **downloader** (pg. 232).
+
+* Multi-threaded **reverse shells** may be used when the malware is encoding ingress/egress data: one thread will read the shell's ```stdin``` pipe, encode, and write to a network socket, the other thread will read from the network socket, decode, and write to the shell's ```stdout``` pipe (pg. 233).
+
+* A **credential stealing** malware DLL might contain 15+ exports starting with ```Wlx*``` , being a Graphical Identification and Authentication (GINA) interceptor - it abuses  support for 3rd party authentication mechanisms to MITM ```winlogon.exe``` and steal credentials (pg. 235).
+
+* **Hash dumping** tools target The Local Security Authority Subsystem Service (LSASS, runs as ```lsass.exe```) since it has the privileges and APIs necessary to extract the hashes of local user accounts (pg. 236).
+
+* There are two types of **keyloggers**: hooking and polling. Hooking keyloggers notify the malware each time a key is pressed, typically using ```SetWindowsHookEx```. Polling key loggers constantly poll the state of keys, typically using ```GetAsyncKeyState``` and ```GetForegroundWindow``` (pg. 239).
+
+* Registry keys commonly used to maintain persistence:
+
+    * ```HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run```:
+    
+        Specifies programs that will run automatically at startup, very common install location (pg. 241).
+    
+    * ```HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Windows```:
+
+        List     of ```AppInit_DLL```s, which are loaded into every process that loads ```User32.dll```. Malware added here can fingerprint the process at runtime to determine if it should deploy it's payload or not (pg. 242).
+        
+    * ```HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Svchost``` (groups) and ```HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\[ServiceName]``` (services):
+    
+        ```Svchost.exe``` is a genertic host process for DLL-based services that need to be started at runtime, each instance contains a group of possibly related services. By running within a service host process, malware blends into the process list and registry better (pg. 242).
+
+* A commonly used system binary can be **trojanized** - patched to execute malware on run or load. Ex. Modify an important system DLLs's ```DLLEntryPoint``` to load a malicious DLL before resuming normal operation, essentially injecting the malicious DLL into any process that uses the important one (pg. 243).
+
+* **DLL Load Order Hijacking **- if a DLL is not on the ```KnownDLLs``` list, there's a sequence of directories Windows will attempt to find it in. If a malicious DLL of the same name as a legitimate one is placed in a directory searched first, then the malicious one will get loaded and the search will terminate. The malicious one can  always import the legitimate one to maintain functionality. This method is simple and covert, no need for registry or binary modification (pg. 245).
+ 
+ * One method of **privilege escalation** is modification of a processes's access token: get a handle to own process via ```GetCurrentProcess```, open own access token via ```OpenProcessToken```, retrieve the Locally Unique Identifier (LUID) via ```LookupPrivilegeValueA```, and call ```AdjustTokenPrivilege``` to augment own rights (ex. ```SeDebugPrivilege``` allows debugging of other programs, useful for DLL injection) (pg. 247).
+
+* **IAT vs inline hooking** - in user-space rootkits, Import Address Table (IAT) hooking replaces an imported API function's pointer with that of a malicious function. This is easy to detect, so inline hooking actually overwrites the imported API's function - either having it jump to malicious code or changing it's behavior (pg. 249).
+ 
 ### Chp. 15 - Anti-Disassembly
 ---
 
