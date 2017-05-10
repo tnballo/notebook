@@ -21,5 +21,21 @@ Reference for those little tasks that are just uncommon enough to forget the ste
 
     * ```sudo mount /dev/sda1 /mnt/usbdrive```
 
+### Create a Temporary Python Virtualenv for Legacy Package Installs
+---
+
+1. Create a new python2 virtualenv in the current directory, then activate it:
+
+    * ```virtualenv -p /usr/bin/python2 py2env```
+    * ```source py2env/bin/activate```
+    
+2. When inside this environment, you should see ```(py2env)``` preceeding the normal terminal prompt. Now install the legacy package required with version explcitly specified:
+
+    * ``` pip install dpkt==1.8.5```
+ 
+3. When done running the legacy scripts, deactivate and remove the virtualenv:
+
+    * ```deactivate```
+    * ```rm -rf py2env/```
 
     
