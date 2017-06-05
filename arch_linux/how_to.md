@@ -38,4 +38,18 @@ Reference for those little tasks that are just uncommon enough to forget the ste
     * ```deactivate```
     * ```rm -rf py2env/```
 
+### Change System Timezone
+---
+
+1. Check current timezone:
+
+    * ``` timedatectl```
+    
+2. List availible timezones:
+
+    * ```timedatectl list-timezones```
+ 
+3. Set new timezone:
+
+    * ```timedatectl set-timezone Zone/SubZone```
     
