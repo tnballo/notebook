@@ -43,19 +43,19 @@
     
         * 4 conditions must be met for a deadlock to occur:
         
-            * **Mutual exclusion ** -  Some finite resource that is not sharable.
+            * **Mutual exclusion** -  Some finite resource that is not sharable.
             
-            * **Hold and wait ** -  There’s some mechanism to hold one resource and wait for another (ex. mutexes).
+            * **Hold and wait** -  There’s some mechanism to hold one resource and wait for another (ex. mutexes).
             
-            * **No preemption ** - The system will not preempt the resources in contention.
+            * **No preemption** - The system will not preempt the resources in contention.
             
-            * **Circular wait ** -  ex. process A is waiting on B, B is waiting on A.
+            * **Circular wait** -  ex. process A is waiting on B, B is waiting on A.
             
         * 3 strategies to avoid deadlock:
         
             * **Prevention** -  Structure your system so that a condition leading to deadlock is impossible (best).
             
-            * **Avoidance ** - When a request that would cause deadlock arrives, reject it.
+            * **Avoidance** - When a request that would cause deadlock arrives, reject it.
             
             * **Detection and recovery** -  After a deadlock is detected, break one of the above conditions.
             
