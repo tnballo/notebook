@@ -10,3 +10,5 @@ Running notes - concepts, commands, and code snippets.
 * [reverse_engineering](https://github.com/tnballo/notebook/tree/master/reverse_engineering) - reverse engineering tips and tricks.
 
 * [shellcode](https://github.com/tnballo/notebook/tree/master/shellcode) - sample shellcode and an assembly-to-opcode conversion script.
+
+* [systems](https://github.com/tnballo/notebook/tree/master/systems) - collection of notes on all things systems-related.
