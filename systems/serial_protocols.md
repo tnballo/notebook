@@ -19,7 +19,7 @@
 
     * **Simple** - can only transmit in one direction
 
-    * **Half-duplex **- can transmit in one direction at a time, but direction can be switched back/forth.
+    * **Half-duplex**- can transmit in one direction at a time, but direction can be switched back/forth.
 
     * **Full-duplex** - data can be simultaneously transmitted in both directions.
 
