@@ -45,9 +45,9 @@ Reference for those little tasks that are just uncommon enough to forget the ste
 
     * ``` timedatectl```
     
-2. List availible timezones:
+2. List availible US timezones:
 
-    * ```timedatectl list-timezones```
+    * ```timedatectl list-timezones | grep "America"```
  
 3. Set new timezone:
 
