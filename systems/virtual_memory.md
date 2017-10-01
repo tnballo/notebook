@@ -85,13 +85,13 @@
  
 * Kernel address spaces always start with an MSB of 1, user space address spaces always start with an MSB of 0. This is because the kernel lives in the very top of the 64-bit address space.
 
-* **Fork (syscall for creating a new process)** - copy-on-write greatly reduces physical memory overhead for forked processes, since most of the data is the same. As long as the forked process just reads, it can share the parent’s physical pages. Forked processes writes are treated as private copy-on-write.
+* **```fork```(syscall for creating a new process)** - copy-on-write greatly reduces physical memory overhead for forked processes, since most of the data is the same. As long as the forked process just reads, it can share the parent’s physical pages. Forked processes writes are treated as private copy-on-write.
 
-* **execve (syscall for executable loading)** - execve does not create a new process, it loads and runs a new program in a new virtual address space, in the current process. It frees all the structs and page tables used by the current process, then creates new ones. The new segments are backed by the executable file (except the uninitialized data, which is private demand-zero). Note that loading is just a re-write of kernel data structures, nothing is actually copied until it is called for the first time.
+* **```execve``` (syscall for executable loading)** - ```execve``` does not create a new process, it loads and runs a new program in a new virtual address space, in the current process. It frees all the structs and page tables used by the current process, then creates new ones. The new segments are backed by the executable file (except the uninitialized data, which is private demand-zero). Note that loading is just a re-write of kernel data structures, nothing is actually copied until it is called for the first time.
 
     * Linking is greatly simplified, since binary segments and heap can start at the same virtual addresses for every process. Execve allocates virtual pages for .text and .data sections, but marks the PTE invalid, tricking kernel into page faulting and loading the data from memory at runtime - hence only loading when/if needed.
 
-    * A VM “area” is a segment, a contiguous chunk of VM who’s pages are related in some way. Ex. code segment, data segment, etc. All of the segments are outlined in the ELF binary, execve creates the segments in VM when it loads the binary.
+    * A VM “area” is a segment, a contiguous chunk of VM who’s pages are related in some way. Ex. code segment, data segment, etc. All of the segments are outlined in the ELF binary, ```execve``` creates the segments in VM when it loads the binary.
 
 * **Address translation with a single-level page table:**
 
